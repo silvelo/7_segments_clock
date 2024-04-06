@@ -1,0 +1,8 @@
+{
+    "cmake.configureOnOpen": false,
+    "files.associations": {
+        "memory": "cpp",
+        "istream": "cpp",
+        "functional": "cpp"
+    }
+}

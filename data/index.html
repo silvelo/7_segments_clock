@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NeoPixel Clock Control Panel</title>
+    <style>
+        .color_form {
+            display: grid;
+            padding: 8px;
+            grid-template-columns: 1fr 1fr;
+            margin-bottom: 20px;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.2);
+
+
+            .button_submit {
+                margin-top: 1rem;
+                grid-column: 1 / span 2;
+                background-color: cornflowerblue;
+                color: white;
+                font-size: 16px;
+                border-radius: 25px;
+                font-weight: bold;
+                padding: 8px;
+            }
+        }
+
+        .wifi_form {
+            display: grid;
+            padding: 8px;
+            grid-template-columns: 1fr;
+            margin-bottom: 20px;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.2);
+
+
+            .button_submit {
+                margin-top: 1rem;
+                grid-column: 1 / span 2;
+                background-color: cornflowerblue;
+                color: white;
+                font-size: 16px;
+                border-radius: 25px;
+                font-weight: bold;
+                padding: 8px;
+            }
+        }
+
+        .full_width {
+            grid-column: 1 / span 2;
+        }
+
+        .hour_form {
+            display: flex;
+            flex-direction: column;
+
+            h3 {
+                flex: 1;
+            }
+
+            .inputs {
+                display: flex;
+
+                div {
+                    flex-basis: 50%;
+                }
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Welcome to NeoPixel Clock Control Panel</h1>
+
+    <form class="color_form" action="/timezone" method="post">
+        <h2 class="full_width">Change Clock TimeZone</h2>
+        <section class="hour_form">
+            <h3>Set TimeZone Offset</h3>
+            <section class="inputs">
+                <div>
+                    <label>Time Offset:</label>
+                    <input type="number" id="hour_led1_color" name="timeOffset">
+                </div>
+            </section>
+        </section>
+        <input class="button_submit" type="submit" value="Set Time Offset">
+    </form>
+
+    <form class="color_form" action="/colors" method="post">
+        <h2 class="full_width">Change NeoPixel Color</h2>
+        <section class="hour_form">
+            <h3>Hour 1</h3>
+            <section class="inputs">
+                <div>
+                    <label>LED 1:</label>
+                    <input type="color" id="hour_led1_color" name="hour_led1_color">
+                </div>
+                <div>
+                    <label>LED 2:</label>
+                    <input type="color" id="hour_led2_color" name="hour_led2_color">
+                </div>
+            </section>
+            
+        </section>
+
+
+        <section class="hour_form full_width">
+            <h3>Dots</h3>
+            <section class="inputs">
+                <div>
+                    <label>LED 1:</label>
+                    <input type="color" id="dots_led1_color" name="dots_led1_color"><br>
+                </div>
+                <div>
+                    <label>LED 2:</label>
+                    <input type="color" id="dots_led2_color" name="dots_led2_color"><br>
+                </div>
+            </section>
+        </section>
+        <section class="hour_form">
+            <h3>Minutes 1</h3>
+            <section class="inputs">
+                <div>
+                    <label>LED 1:</label>
+                    <input type="color" id="minutes_led1_color" name="minutes_led1_color"><br>
+                </div>
+                <label>LED 2:</label>
+                <input type="color" id="minutes_led2_color" name="minutes_led2_color"><br>
+            </section>
+        </section>
+
+        <input class="button_submit" type="submit" value="Set Colors">
+    </form>
+
+    <script>
+
+        fetch('/colors').then(response => response.json()).then(data => {
+            document.getElementById("hour_led1_color").value = data.hour_led1_color;
+            document.getElementById("hour_led2_color").value = data.hour_led2_color;
+            document.getElementById("dots_led1_color").value = data.dots_led1_color;
+            document.getElementById("dots_led2_color").value = data.dots_led2_color;
+            document.getElementById("minutes_led1_color").value = data.minutes_led1_color;
+            document.getElementById("minutes_led2_color").value = data.minutes_led2_color;
+
+        });
+    </script>
+
+</body>
+
+
+
+</html>
