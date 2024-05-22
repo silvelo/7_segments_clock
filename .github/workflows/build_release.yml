@@ -47,7 +47,9 @@ jobs:
   release:
     name: Release
     # if: startsWith(github.event.ref, 'refs/tags/v')
-    needs: build
+    needs:
+      - build
+      - changelog
     permissions:
       contents: write
     runs-on: ubuntu-latest
