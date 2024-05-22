@@ -30,13 +30,13 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: firmware
-          path: .pio/build/*/firmware_*.bin
+          path: .pio/build/*/firmware.bin
           retention-days: 1
       - name: spiffs
         uses: actions/upload-artifact@v4
         with:
           name: spiffs
-          path: .pio/build/*/spiffs_*.bin
+          path: .pio/build/*/spiffs.bin
           retention-days: 1
   release:
     name: Release
@@ -55,5 +55,5 @@ jobs:
       - name: release
         uses: ncipollo/release-action@v1
         with:
-          artifacts: "firmware/*/firmware_*.bin,spiffs/*/spiffs_*.bin"
+          artifacts: "firmware/*/firmware.bin,spiffs/*/spiffs.bin"
           bodyFile: "CHANGELOG.md"
