@@ -5,12 +5,18 @@ on:
   pull_request:
     branches: [main]
 jobs:
+  changelog:
+    runs-on: ubuntu-latest
+    steps:
+      - name: "✏️ Generate release changelog"
+        uses: heinrichreimer/action-github-changelog-generator@v2.3
   build:
     name: Build
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
+
       - name: Set up python
         uses: actions/setup-python@v5
         with:
@@ -48,6 +54,9 @@ jobs:
     steps:
       - name: Checkout repo for CHANGELOG
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: main
       - name: Download artifacts
         uses: actions/download-artifact@v4
       # - name: Display structure of downloaded files
