@@ -4,24 +4,10 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>7 Segment Clock</title>
+    <link  rel="stylesheet" type="text/css"  href="style.css">
     <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-      * {
-        box-sizing: border-box;
-        padding: 0;
-        margin: 0;
-      }
-
-      html,
-      body {
-        height: 100dvh;
-      }
-
-      body {
-        margin: 0;
-        font-family: Roboto, "Helvetica Neue", sans-serif;
-      }
-    </style>
+    <script src="main.js"  type="text/javascript"></script>
+    
   </head>
 
   <body>
@@ -40,7 +26,7 @@
         >
           Set TimeZone Offset
         </p>
-        <form class="color_form" action="/timezone" method="post">
+        <form id="timeOffsetForm" class="color_form" onsubmit="setTimezone(event)">
           <label
             for="timeOffset"
             class="mb-3 block text-base font-medium text-[#07074D]"
@@ -76,7 +62,7 @@
           Change NeoPixel Color
         </h4>
 
-        <form class="color_form" action="/colors" method="post">
+        <form class="color_form" id="colorsForm" onsubmit="setColors(event)">
           <p
             class="mt-1 block font-sans text-base font-normal leading-relaxed text-gray-700 antialiased"
           >
@@ -161,14 +147,14 @@
       <h4
         class="block font-sans text-2xl font-semibold leading-snug tracking-normal text-blue-gray-900 antialiased"
       >
-        Time Zone and NTP Server
+        Deep Sleep
       </h4>
       <p
         class="mt-1 block font-sans text-base font-normal leading-relaxed text-gray-700 antialiased"
       >
-        Set TimeZone Offset
+        Set sleep hours
       </p>
-      <form class="color_form" action="/deep-sleep" method="post">
+      <form class="color_form" id="deepSleepForm" onsubmit="setDeepSleep(event)">
         <label
           for="start_timestamp"
           class="mb-3 block text-base font-medium text-[#07074D]">
@@ -198,23 +184,6 @@
       </form>
     </div>
     </section>
-    <script>
-      fetch("/colors")
-        .then((response) => response.json())
-        .then((data) => {
-          document.getElementById("hour_led1_color").value =
-            data.hour_led1_color;
-          document.getElementById("hour_led2_color").value =
-            data.hour_led2_color;
-          document.getElementById("dots_led1_color").value =
-            data.dots_led1_color;
-          document.getElementById("dots_led2_color").value =
-            data.dots_led2_color;
-          document.getElementById("minutes_led1_color").value =
-            data.minutes_led1_color;
-          document.getElementById("minutes_led2_color").value =
-            data.minutes_led2_color;
-        });
-    </script>
+    
   </body>
 </html>

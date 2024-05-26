@@ -3,8 +3,8 @@
 #include <ArduinoOTA.h>
 #include <SPIFFS.h>
 #include <WiFiManager.h>
-#include <ElegantOTA.h>
 #include "ServerManager.h"
+#include <ElegantOTA.h>
 #include "LedManager.h"
 
 ServerManager &serverManager = ServerManager::getInstance();
@@ -44,14 +44,14 @@ void setup()
   serverManager.begin();
 
   timeClient.begin();
+  AsyncWebServer *server = serverManager.getServer();
 
-  ElegantOTA.begin(serverManager.getServer());
+  ElegantOTA.begin(server);
   ledManager.initLEDs();
 }
 
 void loop()
 {
-  serverManager.handleClient();
   ElegantOTA.loop();
   timeClient.update();
 

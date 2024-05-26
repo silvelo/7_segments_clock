@@ -1,5 +1,5 @@
-#include "ServerManager.h"
 #include <SPIFFS.h>
+#include "ServerManager.h"
 
 ServerManager &ServerManager::getInstance()
 {
@@ -14,50 +14,53 @@ ServerManager::ServerManager()
 
 void ServerManager::begin()
 {
+    if (!SPIFFS.begin())
+    {
+        Serial.println("Error al montar el sistema de archivos");
+        return;
+    }
+
+    server.serveStatic("/", SPIFFS, "/").setDefaultFile("index.html");
+
+    server.on("/colors", HTTP_GET, std::bind(&ServerManager::getColors, this, std::placeholders::_1));
+    server.on("/timezone", HTTP_GET, std::bind(&ServerManager::getTimezone, this, std::placeholders::_1));
+    server.on("/deep-sleep", HTTP_GET, std::bind(&ServerManager::getDeepSleep, this, std::placeholders::_1));
+
+    server.on("/colors", HTTP_POST, std::bind(&ServerManager::updateColors, this, std::placeholders::_1));
+    server.on("/timezone", HTTP_POST, std::bind(&ServerManager::updateTimezone, this, std::placeholders::_1));
+    server.on("/deep-sleep", HTTP_POST, std::bind(&ServerManager::updateDeepSleep, this, std::placeholders::_1));
+
     server.begin();
-    server.on("/", HTTP_GET, std::bind(&ServerManager::handleRoot, this));
-    server.on("/colors", HTTP_GET, std::bind(&ServerManager::getColors, this));
-    server.on("/colors", HTTP_POST, std::bind(&ServerManager::updateColors, this));
-    server.on("/deep-sleep", HTTP_GET, std::bind(&ServerManager::getDeepSleep, this));
-    server.on("/deep-sleep", HTTP_POST, std::bind(&ServerManager::updateDeepSleep, this));
 }
 
-WebServer *ServerManager::getServer()
+AsyncWebServer *ServerManager::getServer()
 {
     return &server;
 }
 
-void ServerManager::handleClient()
+void ServerManager::handleRoot(AsyncWebServerRequest *request)
 {
-    server.handleClient();
+    serveFile("/index.html", "text/html", request);
 }
 
-void ServerManager::handleRoot()
+void ServerManager::handleCSS(AsyncWebServerRequest *request)
 {
-    serveFile("/index.html", "text/html");
+    serveFile("/style.css", "text/css", request);
 }
 
-void ServerManager::serveFile(const String &filePath, const String &contentType)
+void ServerManager::handleJS(AsyncWebServerRequest *request)
 {
-    File file = SPIFFS.open(filePath, "r");
-    if (!file)
-    {
-        Serial.println("Error al abrir el archivo");
-        server.send(500, "text/plain", "Error interno del servidor");
-        return;
-    }
-    server.streamFile(file, contentType);
-    file.close();
+    serveFile("/main.js", "text/javascript", request);
 }
 
-void ServerManager::getColors()
+void ServerManager::getColors(AsyncWebServerRequest *request)
 {
     JsonDocument colorData = createColorJson();
 
     String jsonString;
     serializeJson(colorData, jsonString);
 
-    server.send(200, MIME_APPLICATION_JSON, jsonString);
+    request->send(200, MIME_APPLICATION_JSON, jsonString);
 }
 
 uint32_t ServerManager::stringToHex(const String &hexColorString)
@@ -73,23 +76,24 @@ String ServerManager::hexToString(uint32_t hexColor)
     return "#" + hexColorString;
 }
 
-void ServerManager::updateColors()
+void ServerManager::updateColors(AsyncWebServerRequest *request)
 {
-    if (server.args() > 0)
+    if (request->hasParam("hour_led1_color") && request->hasParam("hour_led2_color") && request->hasParam("dots_led1_color") &&
+        request->hasParam("dots_led2_color") && request->hasParam("minutes_led1_color") && request->hasParam("minutes_led2_color"))
     {
-        preferencesManager.setHourLed1Color(stringToHex(server.arg("hour_led1_color")));
-        preferencesManager.setHourLed2Color(stringToHex(server.arg("hour_led2_color")));
-        preferencesManager.setDotsLed1Color(stringToHex(server.arg("dots_led1_color")));
-        preferencesManager.setDotsLed2Color(stringToHex(server.arg("dots_led2_color")));
-        preferencesManager.setMinutesLed1Color(stringToHex(server.arg("minutes_led1_color")));
-        preferencesManager.setMinutesLed2Color(stringToHex(server.arg("minutes_led2_color")));
+        preferencesManager.setHourLed1Color(stringToHex(request->getParam("hour_led1_color")->value()));
+        preferencesManager.setHourLed2Color(stringToHex(request->getParam("hour_led2_color")->value()));
+        preferencesManager.setDotsLed1Color(stringToHex(request->getParam("dots_led1_color")->value()));
+        preferencesManager.setDotsLed2Color(stringToHex(request->getParam("dots_led2_color")->value()));
+        preferencesManager.setMinutesLed1Color(stringToHex(request->getParam("minutes_led1_color")->value()));
+        preferencesManager.setMinutesLed2Color(stringToHex(request->getParam("minutes_led2_color")->value()));
 
         ledManager.updateColorsFromPreferences();
     }
-    server.send(204);
+    request->send(204);
 }
 
-void ServerManager::getTimezone()
+void ServerManager::getTimezone(AsyncWebServerRequest *request)
 {
     JsonDocument timezoneData;
 
@@ -98,22 +102,21 @@ void ServerManager::getTimezone()
     String jsonString;
     serializeJson(timezoneData, jsonString);
 
-    server.send(200, MIME_APPLICATION_JSON, jsonString);
+    request->send(200, MIME_APPLICATION_JSON, jsonString);
 }
 
-void ServerManager::updateTimezone()
+void ServerManager::updateTimezone(AsyncWebServerRequest *request)
 {
-    if (server.args() > 0)
+    if (request->hasParam("timeOffset"))
     {
-        int timeOffset = server.arg("timeOffset").toInt();
+        int timeOffset = request->getParam("timeOffset")->value().toInt();
         preferencesManager.setTimeOffset(timeOffset * 3600);
-        // timeClient.setTimeOffset(timeOffset * 3600);
     }
 
-    server.send(204);
+    request->send(204);
 }
 
-void ServerManager::getDeepSleep()
+void ServerManager::getDeepSleep(AsyncWebServerRequest *request)
 {
     JsonDocument deepSleepData;
 
@@ -123,18 +126,18 @@ void ServerManager::getDeepSleep()
     String jsonString;
     serializeJson(deepSleepData, jsonString);
 
-    server.send(200, MIME_APPLICATION_JSON, jsonString);
+    request->send(200, MIME_APPLICATION_JSON, jsonString);
 }
 
-void ServerManager::updateDeepSleep()
+void ServerManager::updateDeepSleep(AsyncWebServerRequest *request)
 {
-    if (server.args() > 0)
+    if (request->hasParam("start_timestamp") && request->hasParam("end_timestamp"))
     {
-        preferencesManager.setStartTimestamp(server.arg("start_timestamp").toInt());
-        preferencesManager.setEndTimestamp(server.arg("end_timestamp").toInt());
+        preferencesManager.setStartTimestamp(request->getParam("start_timestamp")->value().toInt());
+        preferencesManager.setEndTimestamp(request->getParam("end_timestamp")->value().toInt());
     }
 
-    server.send(204);
+    request->send(204);
 }
 
 JsonDocument ServerManager::createColorJson()
