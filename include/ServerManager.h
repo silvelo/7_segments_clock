@@ -6,6 +6,7 @@
 #include <ArduinoJson.h>
 #include "PreferencesManager.h"
 #include "LedManager.h"
+#include "TimeManager.h"
 
 #define MIME_APPLICATION_JSON "application/json"
 
@@ -16,12 +17,6 @@ public:
 
     AsyncWebServer *getServer();
     void begin();
-    void getColors(AsyncWebServerRequest *request);
-    void updateColors(AsyncWebServerRequest *request);
-    void getTimezone(AsyncWebServerRequest *request);
-    void updateTimezone(AsyncWebServerRequest *request);
-    void getDeepSleep(AsyncWebServerRequest *request);
-    void updateDeepSleep(AsyncWebServerRequest *request);
 
 private:
     ServerManager();
@@ -31,6 +26,14 @@ private:
     AsyncWebServer server;
     PreferencesManager &preferencesManager;
     LedManager &ledManager;
+    TimeManager &timeManager;
+
+    void getColors(AsyncWebServerRequest *request);
+    void updateColors(AsyncWebServerRequest *request, uint8_t *data, size_t len, size_t index, size_t total);
+    void getTimezone(AsyncWebServerRequest *request);
+    void updateTimezone(AsyncWebServerRequest *request, uint8_t *data, size_t len, size_t index, size_t total);
+    void getDeepSleep(AsyncWebServerRequest *request);
+    void updateDeepSleep(AsyncWebServerRequest *request, uint8_t *data, size_t len, size_t index, size_t total);
     void handleRoot(AsyncWebServerRequest *request);
     void handleCSS(AsyncWebServerRequest *request);
     void handleJS(AsyncWebServerRequest *request);
@@ -38,6 +41,7 @@ private:
     JsonDocument createColorJson();
     uint32_t stringToHex(const String &hexString);
     String hexToString(uint32_t hex);
+    String getBodyContent(uint8_t *data, size_t len);
 };
 
 #endif

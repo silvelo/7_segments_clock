@@ -8,12 +8,14 @@ ServerManager &ServerManager::getInstance()
 }
 
 ServerManager::ServerManager()
-    : server(80), preferencesManager(PreferencesManager::getInstance()), ledManager(LedManager::getInstance())
+    : server(80), preferencesManager(PreferencesManager::getInstance()), ledManager(LedManager::getInstance()), timeManager(TimeManager::getInstance())
 {
 }
 
 void ServerManager::begin()
 {
+    Serial.begin(115200);
+
     if (!SPIFFS.begin())
     {
         Serial.println("Error al montar el sistema de archivos");
@@ -26,11 +28,12 @@ void ServerManager::begin()
     server.on("/timezone", HTTP_GET, std::bind(&ServerManager::getTimezone, this, std::placeholders::_1));
     server.on("/deep-sleep", HTTP_GET, std::bind(&ServerManager::getDeepSleep, this, std::placeholders::_1));
 
-    server.on("/colors", HTTP_POST, std::bind(&ServerManager::updateColors, this, std::placeholders::_1));
-    server.on("/timezone", HTTP_POST, std::bind(&ServerManager::updateTimezone, this, std::placeholders::_1));
-    server.on("/deep-sleep", HTTP_POST, std::bind(&ServerManager::updateDeepSleep, this, std::placeholders::_1));
+    server.on("/colors", HTTP_POST, [](AsyncWebServerRequest *request) {}, NULL, std::bind(&ServerManager::updateColors, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4, std::placeholders::_5));
+    server.on("/timezone", HTTP_POST, [](AsyncWebServerRequest *request) {}, NULL, std::bind(&ServerManager::updateTimezone, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4, std::placeholders::_5));
+    server.on("/deep-sleep", HTTP_POST, [](AsyncWebServerRequest *request) {}, NULL, std::bind(&ServerManager::updateDeepSleep, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4, std::placeholders::_5));
 
     server.begin();
+    Serial.println("Servidor inicializado.");
 }
 
 AsyncWebServer *ServerManager::getServer()
@@ -55,12 +58,145 @@ void ServerManager::handleJS(AsyncWebServerRequest *request)
 
 void ServerManager::getColors(AsyncWebServerRequest *request)
 {
+    Serial.println(String("[") + request->methodToString() + "] " + request->url());
     JsonDocument colorData = createColorJson();
 
     String jsonString;
     serializeJson(colorData, jsonString);
+    request->send(200, MIME_APPLICATION_JSON, jsonString);
+}
+
+void ServerManager::updateColors(AsyncWebServerRequest *request, uint8_t *data, size_t len, size_t index, size_t total)
+{
+
+    Serial.println(String("[") + request->methodToString() + "] " + request->url());
+    String bodyContent = getBodyContent(data, len);
+
+    JsonDocument body;
+    DeserializationError error = deserializeJson(body, bodyContent);
+    if (error)
+    {
+        request->send(400);
+        return;
+    }
+
+    if (
+        body.containsKey("hour_led1_color") && body.containsKey("hour_led2_color") &&
+        body.containsKey("dots_led1_color") && body.containsKey("dots_led2_color") &&
+        body.containsKey("minutes_led1_color") && body.containsKey("minutes_led2_color"))
+    {
+
+        preferencesManager.setHourLed1Color(stringToHex(body["hour_led1_color"]));
+        preferencesManager.setHourLed2Color(stringToHex(body["hour_led2_color"]));
+        preferencesManager.setDotsLed1Color(stringToHex(body["dots_led1_color"]));
+        preferencesManager.setDotsLed2Color(stringToHex(body["dots_led2_color"]));
+        preferencesManager.setMinutesLed1Color(stringToHex(body["minutes_led1_color"]));
+        preferencesManager.setMinutesLed2Color(stringToHex(body["minutes_led2_color"]));
+
+        ledManager.updateColorsFromPreferences();
+
+        request->send(204);
+        return;
+    }
+
+    request->send(400);
+}
+
+void ServerManager::getTimezone(AsyncWebServerRequest *request)
+{
+    Serial.println(String("[") + request->methodToString() + "] " + request->url());
+    JsonDocument timezoneData;
+
+    timezoneData["timeOffset"] = preferencesManager.getTimeOffset();
+
+    String jsonString;
+    serializeJson(timezoneData, jsonString);
 
     request->send(200, MIME_APPLICATION_JSON, jsonString);
+}
+
+void ServerManager::updateTimezone(AsyncWebServerRequest *request, uint8_t *data, size_t len, size_t index, size_t total)
+{
+
+    Serial.println(String("[") + request->methodToString() + "] " + request->url());
+    String bodyContent = getBodyContent(data, len);
+
+    JsonDocument body;
+    DeserializationError error = deserializeJson(body, bodyContent);
+    if (error)
+    {
+        request->send(400);
+        return;
+    }
+
+    if (body.containsKey("timeOffset"))
+    {
+
+        int timeOffset = body["timeOffset"].as<int>();
+        preferencesManager.setTimeOffset(timeOffset);
+        timeManager.setTimeOffset(timeOffset * 3600);
+
+        request->send(204);
+        return;
+    }
+
+    request->send(400);
+}
+
+void ServerManager::getDeepSleep(AsyncWebServerRequest *request)
+{
+    Serial.println(String("[") + request->methodToString() + "] " + request->url());
+    JsonDocument deepSleepData;
+
+    deepSleepData["start_timestamp"] = preferencesManager.getStartTimestamp();
+    deepSleepData["end_timestamp"] = preferencesManager.getEndTimestamp();
+
+    String jsonString;
+    serializeJson(deepSleepData, jsonString);
+
+    request->send(200, MIME_APPLICATION_JSON, jsonString);
+}
+
+void ServerManager::updateDeepSleep(AsyncWebServerRequest *request, uint8_t *data, size_t len, size_t index, size_t total)
+{
+
+    Serial.println(String("[") + request->methodToString() + "] " + request->url());
+    String bodyContent = getBodyContent(data, len);
+
+    JsonDocument body;
+    DeserializationError error = deserializeJson(body, bodyContent);
+    if (error)
+    {
+        request->send(400);
+        return;
+    }
+
+    if (
+        body.containsKey("start_timestamp") && body.containsKey("end_timestamp"))
+    {
+
+        preferencesManager.setStartTimestamp(body["start_timestamp"].as<int>());
+        preferencesManager.setEndTimestamp(body["end_timestamp"].as<int>());
+
+        request->send(204);
+        return;
+    }
+
+    request->send(400);
+}
+
+JsonDocument ServerManager::createColorJson()
+{
+    JsonDocument colorData;
+
+    colorData["hour_led1_color"] = hexToString(preferencesManager.getHourLed1Color());
+    colorData["hour_led2_color"] = hexToString(preferencesManager.getHourLed2Color());
+    colorData["dots_led1_color"] = hexToString(preferencesManager.getDotsLed1Color());
+    colorData["dots_led2_color"] = hexToString(preferencesManager.getDotsLed2Color());
+    colorData["minutes_led1_color"] = hexToString(preferencesManager.getMinutesLed1Color());
+    colorData["minutes_led2_color"] = hexToString(preferencesManager.getMinutesLed2Color());
+
+    return colorData;
 }
 
 uint32_t ServerManager::stringToHex(const String &hexColorString)
@@ -76,80 +212,12 @@ String ServerManager::hexToString(uint32_t hexColor)
     return "#" + hexColorString;
 }
 
-void ServerManager::updateColors(AsyncWebServerRequest *request)
+String ServerManager::getBodyContent(uint8_t *data, size_t len)
 {
-    if (request->hasParam("hour_led1_color") && request->hasParam("hour_led2_color") && request->hasParam("dots_led1_color") &&
-        request->hasParam("dots_led2_color") && request->hasParam("minutes_led1_color") && request->hasParam("minutes_led2_color"))
+    String content = "";
+    for (size_t i = 0; i < len; i++)
     {
-        preferencesManager.setHourLed1Color(stringToHex(request->getParam("hour_led1_color")->value()));
-        preferencesManager.setHourLed2Color(stringToHex(request->getParam("hour_led2_color")->value()));
-        preferencesManager.setDotsLed1Color(stringToHex(request->getParam("dots_led1_color")->value()));
-        preferencesManager.setDotsLed2Color(stringToHex(request->getParam("dots_led2_color")->value()));
-        preferencesManager.setMinutesLed1Color(stringToHex(request->getParam("minutes_led1_color")->value()));
-        preferencesManager.setMinutesLed2Color(stringToHex(request->getParam("minutes_led2_color")->value()));
-
-        ledManager.updateColorsFromPreferences();
+        content.concat((char)data[i]);
     }
-    request->send(204);
-}
-
-void ServerManager::getTimezone(AsyncWebServerRequest *request)
-{
-    JsonDocument timezoneData;
-
-    timezoneData["timeOffset"] = preferencesManager.getTimeOffset();
-
-    String jsonString;
-    serializeJson(timezoneData, jsonString);
-
-    request->send(200, MIME_APPLICATION_JSON, jsonString);
-}
-
-void ServerManager::updateTimezone(AsyncWebServerRequest *request)
-{
-    if (request->hasParam("timeOffset"))
-    {
-        int timeOffset = request->getParam("timeOffset")->value().toInt();
-        preferencesManager.setTimeOffset(timeOffset * 3600);
-    }
-
-    request->send(204);
-}
-
-void ServerManager::getDeepSleep(AsyncWebServerRequest *request)
-{
-    JsonDocument deepSleepData;
-
-    deepSleepData["start_timestamp"] = preferencesManager.getStartTimestamp();
-    deepSleepData["end_timestamp"] = preferencesManager.getEndTimestamp();
-
-    String jsonString;
-    serializeJson(deepSleepData, jsonString);
-
-    request->send(200, MIME_APPLICATION_JSON, jsonString);
-}
-
-void ServerManager::updateDeepSleep(AsyncWebServerRequest *request)
-{
-    if (request->hasParam("start_timestamp") && request->hasParam("end_timestamp"))
-    {
-        preferencesManager.setStartTimestamp(request->getParam("start_timestamp")->value().toInt());
-        preferencesManager.setEndTimestamp(request->getParam("end_timestamp")->value().toInt());
-    }
-
-    request->send(204);
-}
-
-JsonDocument ServerManager::createColorJson()
-{
-    JsonDocument colorData;
-
-    colorData["hour_led1_color"] = hexToString(preferencesManager.getHourLed1Color());
-    colorData["hour_led2_color"] = hexToString(preferencesManager.getHourLed2Color());
-    colorData["dots_led1_color"] = hexToString(preferencesManager.getDotsLed1Color());
-    colorData["dots_led2_color"] = hexToString(preferencesManager.getDotsLed2Color());
-    colorData["minutes_led1_color"] = hexToString(preferencesManager.getMinutesLed1Color());
-    colorData["minutes_led2_color"] = hexToString(preferencesManager.getMinutesLed2Color());
-
-    return colorData;
+    return content;
 }

@@ -1,5 +1,4 @@
 #include "LedManager.h"
-#include "PreferencesManager.h"
 
 LedManager &LedManager::getInstance()
 {
@@ -15,11 +14,13 @@ LedManager::LedManager()
 {
 }
 
-void LedManager::initLEDs()
+void LedManager::begin()
 {
+    Serial.begin(115200);
     hoursStrip.begin();
     minutesStrip.begin();
     secondsStrip.begin();
+    Serial.println("Led Manager inicializado.");
 }
 
 void LedManager::showHours(int hour)

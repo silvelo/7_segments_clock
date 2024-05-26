@@ -15,7 +15,7 @@ class LedManager
 public:
     static LedManager &getInstance();
 
-    void initLEDs();
+    void begin();
     void showHours(int hour);
     void showMinutes(int minutes);
     void showColon();

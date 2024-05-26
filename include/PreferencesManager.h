@@ -1,14 +1,24 @@
 #ifndef PREFERENCES_MANAGER_H
 #define PREFERENCES_MANAGER_H
 
-#include <Preferences.h>
+#define DEFAULT_LED_COLOR 0xFFFFFF
+#define TIME_OFFSET "to"
+#define START_TIMESTAMP "st"
+#define END_TIMESTAMP "et"
+#define HOUR_LED_1_COLOR "hl1c"
+#define HOUR_LED_2_COLOR "hl2c"
+#define DOTS_LED_1_COLOR "dl1c"
+#define DOTS_LED_2_COLOR "dl2c"
+#define MINUTES_LED_1_COLOR "ml1c"
+#define MINUTES_LED_2_COLOR "ml2c"
 
+#include <Preferences.h>
 class PreferencesManager
 {
 public:
     static PreferencesManager &getInstance();
 
-    void begin(const char *namespace_);
+    void begin();
     int getTimeOffset();
     void setTimeOffset(int timeOffset);
     uint32_t getStartTimestamp();

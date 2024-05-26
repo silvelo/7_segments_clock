@@ -6,9 +6,6 @@ function onLoad() {
     getTimeZone();
 }
 
-
-
-
 function getColors() {
     fetch("/colors")
         .then((response) => response.json())
@@ -30,18 +27,9 @@ function getColors() {
 
 async function setColors(event){
     event.preventDefault();
-    const form = document.getElementById("colorsForm")
-    const formData = new FormData(form);
+    const formElement = document.getElementById("colorsForm")
 
-    try {
-        const response = await fetch("/colors", {
-          method: "POST",
-          body: formData,
-        });
-        console.log(await response.json());
-      } catch (e) {
-        console.error(e);
-      }
+    await setData("/colors", formElement);
 }
 
 function getTimeZone() {
@@ -56,18 +44,9 @@ function getTimeZone() {
 
 async function setTimezone(event){
     event.preventDefault();
-    const form = document.getElementById("timeOffsetForm")
-    const formData = new FormData(form);
-
-    try {
-        const response = await fetch("/timezone", {
-          method: "POST",
-          body: formData,
-        });
-        console.log(await response.json());
-      } catch (e) {
-        console.error(e);
-      }
+    const formElement = document.getElementById("timeOffsetForm")
+   
+    await setData("/timezone", formElement);    
 }
 
 function getDeepSleep() {
@@ -81,16 +60,25 @@ function getDeepSleep() {
 
 async function setDeepSleep(event){
     event.preventDefault();
-    const form = document.getElementById("deepSleepForm")
-    const formData = new FormData(form);
+    const formElement = document.getElementById("deepSleepForm")
+    
+    await setData("/deep-sleep", formElement);
 
-    try {
-        const response = await fetch("/deep-sleep", {
-          method: "POST",
-          body: formData,
-        });
-        console.log(await response.json());
-      } catch (e) {
-        console.error(e);
-      }
+}
+
+async function setData(url, formElement) {
+  const formData = new FormData(formElement);
+
+  try {
+    const response = await fetch(url, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(Object.fromEntries(formData)),
+    });
+    //console.log(await response.json());
+  } catch (e) {
+    console.error(e);
+  }
 }

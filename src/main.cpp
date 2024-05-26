@@ -6,9 +6,13 @@
 #include "ServerManager.h"
 #include <ElegantOTA.h>
 #include "LedManager.h"
+#include "PreferencesManager.h"
+#include "TimeManager.h"
 
 ServerManager &serverManager = ServerManager::getInstance();
 LedManager &ledManager = LedManager::getInstance();
+PreferencesManager &preferencesManager = PreferencesManager::getInstance();
+TimeManager &timeManager = TimeManager::getInstance();
 
 bool showSeconds = true;
 
@@ -42,23 +46,24 @@ void setup()
   }
 
   serverManager.begin();
+  preferencesManager.begin();
+  timeManager.begin();
 
-  timeClient.begin();
   AsyncWebServer *server = serverManager.getServer();
 
   ElegantOTA.begin(server);
-  ledManager.initLEDs();
+  ledManager.begin();
 }
 
 void loop()
 {
   ElegantOTA.loop();
-  timeClient.update();
+  timeManager.update();
 
-  int hours = timeClient.getHours();
-  int minutes = timeClient.getMinutes();
+  int hours = timeManager.getHours();
+  int minutes = timeManager.getMinutes();
 
-  Serial.println(timeClient.getFormattedTime());
+  Serial.println(timeManager.getFormattedTime());
 
   ledManager.showHours(hours);
   ledManager.showMinutes(minutes);

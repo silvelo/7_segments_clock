@@ -1,7 +1,5 @@
+#include <SPIFFS.h>
 #include "PreferencesManager.h"
-
-// Definir el valor predeterminado para los colores LED (blanco)
-const uint32_t DEFAULT_LED_COLOR = 0xFFFFFF;
 
 PreferencesManager &PreferencesManager::getInstance()
 {
@@ -9,97 +7,111 @@ PreferencesManager &PreferencesManager::getInstance()
     return instance;
 }
 
-void PreferencesManager::begin(const char *namespace_)
+void PreferencesManager::begin()
 {
+    Serial.begin(115200);
+
+    if (!SPIFFS.begin())
+    {
+        Serial.println("Error al montar el sistema de archivos");
+        return;
+    }
+
     preferences.begin(preferencesNamespace, false);
+    Serial.println("Preferences inicializado.");
 }
 
 int PreferencesManager::getTimeOffset()
 {
-    return preferences.getInt("timeOffset", 0);
+    return preferences.getInt(TIME_OFFSET);
 }
 
 void PreferencesManager::setTimeOffset(int timeOffset)
 {
-    preferences.putInt("timeOffset", timeOffset);
+    Serial.println("Set time offset: " + String(timeOffset) + " hours.");
+    preferences.putInt(TIME_OFFSET, timeOffset);
 }
 
 uint32_t PreferencesManager::getStartTimestamp()
 {
-    return preferences.getUInt("startTimestamp", 0);
+    Serial.println("Get start timestamp");
+    return preferences.getUInt(START_TIMESTAMP);
 }
 
 void PreferencesManager::setStartTimestamp(uint32_t startTimestamp)
 {
-    preferences.putUInt("startTimestamp", startTimestamp);
+    Serial.println("Set start timestamp: " + String(startTimestamp));
+    preferences.putUInt(START_TIMESTAMP, startTimestamp);
 }
 
 uint32_t PreferencesManager::getEndTimestamp()
 {
-    return preferences.getUInt("endTimestamp", 0);
+    Serial.println("Get end timestamp");
+    return preferences.getUInt(END_TIMESTAMP, 0);
 }
 
 void PreferencesManager::setEndTimestamp(uint32_t endTimestamp)
 {
-    preferences.putUInt("endTimestamp", endTimestamp);
+    Serial.println("Set end timestamp: " + String(endTimestamp));
+    preferences.putUInt(END_TIMESTAMP, endTimestamp);
 }
 
 uint32_t PreferencesManager::getHourLed1Color()
 {
-    return preferences.getUInt("hourLed1Color", DEFAULT_LED_COLOR);
+    return preferences.getUInt(HOUR_LED_1_COLOR, DEFAULT_LED_COLOR);
 }
 
 void PreferencesManager::setHourLed1Color(uint32_t color)
 {
-    preferences.putUInt("hourLed1Color", color);
+    preferences.putUInt(HOUR_LED_1_COLOR, color);
 }
 
 uint32_t PreferencesManager::getHourLed2Color()
 {
-    return preferences.getUInt("hourLed2Color", DEFAULT_LED_COLOR);
+    return preferences.getUInt(HOUR_LED_2_COLOR, DEFAULT_LED_COLOR);
 }
 
 void PreferencesManager::setHourLed2Color(uint32_t color)
 {
-    preferences.putUInt("hourLed2Color", color);
+    preferences.putUInt(HOUR_LED_2_COLOR, color);
 }
 
 uint32_t PreferencesManager::getDotsLed1Color()
 {
-    return preferences.getUInt("dotsLed1Color", DEFAULT_LED_COLOR);
+    return preferences.getUInt(DOTS_LED_1_COLOR, DEFAULT_LED_COLOR);
 }
 
 void PreferencesManager::setDotsLed1Color(uint32_t color)
 {
-    preferences.putUInt("dotsLed1Color", color);
+    preferences.putUInt(DOTS_LED_1_COLOR, color);
 }
 
 uint32_t PreferencesManager::getDotsLed2Color()
 {
-    return preferences.getUInt("dotsLed2Color", DEFAULT_LED_COLOR);
+    return preferences.getUInt(DOTS_LED_2_COLOR, DEFAULT_LED_COLOR);
 }
 
 void PreferencesManager::setDotsLed2Color(uint32_t color)
 {
-    preferences.putUInt("dotsLed2Color", color);
+    preferences.putUInt(DOTS_LED_2_COLOR, color);
 }
 
 uint32_t PreferencesManager::getMinutesLed1Color()
 {
-    return preferences.getUInt("minutesLed1Color", DEFAULT_LED_COLOR);
+    return preferences.getUInt(MINUTES_LED_1_COLOR, DEFAULT_LED_COLOR);
 }
 
 void PreferencesManager::setMinutesLed1Color(uint32_t color)
 {
-    preferences.putUInt("minutesLed1Color", color);
+    preferences.putUInt(MINUTES_LED_1_COLOR, color);
 }
 
 uint32_t PreferencesManager::getMinutesLed2Color()
 {
-    return preferences.getUInt("minutesLed2Color", DEFAULT_LED_COLOR);
+    return preferences.getUInt(MINUTES_LED_2_COLOR, DEFAULT_LED_COLOR);
 }
 
 void PreferencesManager::setMinutesLed2Color(uint32_t color)
 {
-    preferences.putUInt("minutesLed2Color", color);
+    preferences.putUInt(MINUTES_LED_2_COLOR, color);
 }
