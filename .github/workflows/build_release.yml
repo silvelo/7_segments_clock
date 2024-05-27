@@ -58,7 +58,6 @@ jobs:
         uses: ncipollo/release-action@v1
         with:
           artifacts: "firmware/*/firmware.bin,spiffs/*/spiffs.bin"
-          bodyFile: "CHANGELOG.md"
           tag: ${{ steps.tag_version.outputs.new_tag }}
           name: Release ${{ steps.tag_version.outputs.new_tag }}
           body: ${{ steps.tag_version.outputs.changelog }}
