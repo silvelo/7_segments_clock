@@ -56,7 +56,14 @@ jobs:
       - name: release
         uses: ncipollo/release-action@v1
         with:
+          makeLatest: true
           artifacts: "firmware/*/firmware.bin,spiffs/*/spiffs.bin"
           tag: ${{ steps.tag_version.outputs.new_tag }}
           name: Release ${{ steps.tag_version.outputs.new_tag }}
           body: ${{ steps.tag_version.outputs.changelog }}
+      - name: Commit CHANGELOG.md
+        uses: stefanzweifel/git-auto-commit-action@v4
+        with:
+          branch: main
+          commit_message: "docs: update CHANGELOG.md for ${{ github.ref_name }} [skip ci]"
+          file_pattern: CHANGELOG.md
