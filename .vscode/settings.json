@@ -5,6 +5,7 @@
     "istream": "cpp",
     "functional": "cpp"
   },
+  "html.format.wrapAttributes": "aligned-multiple",
   "editor.formatOnSave": true,
-  "html.format.wrapAttributes": "aligned-multiple"
+  "C_Cpp.clang_format_fallbackStyle": "Google"
 }

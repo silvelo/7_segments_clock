@@ -1,63 +1,70 @@
-#include <SPIFFS.h>
 #include "ServerManager.h"
 
-ServerManager &ServerManager::getInstance()
-{
+ServerManager &ServerManager::getInstance() {
     static ServerManager instance;
     return instance;
 }
 
 ServerManager::ServerManager()
-    : server(80), preferencesManager(PreferencesManager::getInstance()), ledManager(LedManager::getInstance()), timeManager(TimeManager::getInstance())
-{
+    : server(80),
+      preferencesManager(PreferencesManager::getInstance()),
+      ledManager(LedManager::getInstance()),
+      timeManager(TimeManager::getInstance()) {
 }
 
-void ServerManager::begin()
-{
+void ServerManager::begin() {
     Serial.begin(115200);
 
-    if (!SPIFFS.begin())
-    {
+    if (!SPIFFS.begin()) {
         Serial.println("Error al montar el sistema de archivos");
         return;
     }
 
     server.serveStatic("/", SPIFFS, "/").setDefaultFile("index.html");
 
-    server.on("/colors", HTTP_GET, std::bind(&ServerManager::getColors, this, std::placeholders::_1));
-    server.on("/timezone", HTTP_GET, std::bind(&ServerManager::getTimezone, this, std::placeholders::_1));
-    server.on("/deep-sleep", HTTP_GET, std::bind(&ServerManager::getDeepSleep, this, std::placeholders::_1));
+    server.on("/colors", HTTP_GET,
+              std::bind(&ServerManager::getColors, this, std::placeholders::_1));
+    server.on("/timezone", HTTP_GET,
+              std::bind(&ServerManager::getTimezone, this, std::placeholders::_1));
+    server.on("/deep-sleep", HTTP_GET,
+              std::bind(&ServerManager::getDeepSleep, this, std::placeholders::_1));
 
-    server.on("/colors", HTTP_POST, [](AsyncWebServerRequest *request) {}, NULL, std::bind(&ServerManager::updateColors, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4, std::placeholders::_5));
-    server.on("/timezone", HTTP_POST, [](AsyncWebServerRequest *request) {}, NULL, std::bind(&ServerManager::updateTimezone, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4, std::placeholders::_5));
-    server.on("/deep-sleep", HTTP_POST, [](AsyncWebServerRequest *request) {}, NULL, std::bind(&ServerManager::updateDeepSleep, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4, std::placeholders::_5));
+    server.on(
+        "/colors", HTTP_POST, [](AsyncWebServerRequest *request) {}, NULL,
+        std::bind(&ServerManager::updateColors, this, std::placeholders::_1, std::placeholders::_2,
+                  std::placeholders::_3, std::placeholders::_4, std::placeholders::_5));
+    server.on(
+        "/timezone", HTTP_POST, [](AsyncWebServerRequest *request) {}, NULL,
+        std::bind(&ServerManager::updateTimezone, this, std::placeholders::_1,
+                  std::placeholders::_2, std::placeholders::_3, std::placeholders::_4,
+                  std::placeholders::_5));
+    server.on(
+        "/deep-sleep", HTTP_POST, [](AsyncWebServerRequest *request) {}, NULL,
+        std::bind(&ServerManager::updateDeepSleep, this, std::placeholders::_1,
+                  std::placeholders::_2, std::placeholders::_3, std::placeholders::_4,
+                  std::placeholders::_5));
 
     server.begin();
     Serial.println("Servidor inicializado.");
 }
 
-AsyncWebServer *ServerManager::getServer()
-{
+AsyncWebServer *ServerManager::getServer() {
     return &server;
 }
 
-void ServerManager::handleRoot(AsyncWebServerRequest *request)
-{
+void ServerManager::handleRoot(AsyncWebServerRequest *request) {
     serveFile("/index.html", "text/html", request);
 }
 
-void ServerManager::handleCSS(AsyncWebServerRequest *request)
-{
+void ServerManager::handleCSS(AsyncWebServerRequest *request) {
     serveFile("/style.css", "text/css", request);
 }
 
-void ServerManager::handleJS(AsyncWebServerRequest *request)
-{
+void ServerManager::handleJS(AsyncWebServerRequest *request) {
     serveFile("/main.js", "text/javascript", request);
 }
 
-void ServerManager::getColors(AsyncWebServerRequest *request)
-{
+void ServerManager::getColors(AsyncWebServerRequest *request) {
     Serial.println(String("[") + request->methodToString() + "] " + request->url());
     JsonDocument colorData = createColorJson();
 
@@ -66,26 +73,21 @@ void ServerManager::getColors(AsyncWebServerRequest *request)
     request->send(200, MIME_APPLICATION_JSON, jsonString);
 }
 
-void ServerManager::updateColors(AsyncWebServerRequest *request, uint8_t *data, size_t len, size_t index, size_t total)
-{
-
+void ServerManager::updateColors(AsyncWebServerRequest *request, uint8_t *data, size_t len,
+                                 size_t index, size_t total) {
     Serial.println(String("[") + request->methodToString() + "] " + request->url());
     String bodyContent = getBodyContent(data, len);
 
     JsonDocument body;
     DeserializationError error = deserializeJson(body, bodyContent);
-    if (error)
-    {
+    if (error) {
         request->send(400);
         return;
     }
 
-    if (
-        body.containsKey("hour_led1_color") && body.containsKey("hour_led2_color") &&
+    if (body.containsKey("hour_led1_color") && body.containsKey("hour_led2_color") &&
         body.containsKey("dots_led1_color") && body.containsKey("dots_led2_color") &&
-        body.containsKey("minutes_led1_color") && body.containsKey("minutes_led2_color"))
-    {
-
+        body.containsKey("minutes_led1_color") && body.containsKey("minutes_led2_color")) {
         preferencesManager.setHourLed1Color(stringToHex(body["hour_led1_color"]));
         preferencesManager.setHourLed2Color(stringToHex(body["hour_led2_color"]));
         preferencesManager.setDotsLed1Color(stringToHex(body["dots_led1_color"]));
@@ -102,8 +104,7 @@ void ServerManager::updateColors(AsyncWebServerRequest *request, uint8_t *data, 
     request->send(400);
 }
 
-void ServerManager::getTimezone(AsyncWebServerRequest *request)
-{
+void ServerManager::getTimezone(AsyncWebServerRequest *request) {
     Serial.println(String("[") + request->methodToString() + "] " + request->url());
     JsonDocument timezoneData;
 
@@ -115,26 +116,22 @@ void ServerManager::getTimezone(AsyncWebServerRequest *request)
     request->send(200, MIME_APPLICATION_JSON, jsonString);
 }
 
-void ServerManager::updateTimezone(AsyncWebServerRequest *request, uint8_t *data, size_t len, size_t index, size_t total)
-{
-
+void ServerManager::updateTimezone(AsyncWebServerRequest *request, uint8_t *data, size_t len,
+                                   size_t index, size_t total) {
     Serial.println(String("[") + request->methodToString() + "] " + request->url());
     String bodyContent = getBodyContent(data, len);
 
     JsonDocument body;
     DeserializationError error = deserializeJson(body, bodyContent);
-    if (error)
-    {
+    if (error) {
         request->send(400);
         return;
     }
 
-    if (body.containsKey("timeOffset"))
-    {
-
+    if (body.containsKey("timeOffset")) {
         int timeOffset = body["timeOffset"].as<int>();
         preferencesManager.setTimeOffset(timeOffset);
-        timeManager.setTimeOffset(timeOffset * 3600);
+        timeManager.setTimeOffset(timeOffset);
 
         request->send(204);
         return;
@@ -143,8 +140,7 @@ void ServerManager::updateTimezone(AsyncWebServerRequest *request, uint8_t *data
     request->send(400);
 }
 
-void ServerManager::getDeepSleep(AsyncWebServerRequest *request)
-{
+void ServerManager::getDeepSleep(AsyncWebServerRequest *request) {
     Serial.println(String("[") + request->methodToString() + "] " + request->url());
     JsonDocument deepSleepData;
 
@@ -157,24 +153,19 @@ void ServerManager::getDeepSleep(AsyncWebServerRequest *request)
     request->send(200, MIME_APPLICATION_JSON, jsonString);
 }
 
-void ServerManager::updateDeepSleep(AsyncWebServerRequest *request, uint8_t *data, size_t len, size_t index, size_t total)
-{
-
+void ServerManager::updateDeepSleep(AsyncWebServerRequest *request, uint8_t *data, size_t len,
+                                    size_t index, size_t total) {
     Serial.println(String("[") + request->methodToString() + "] " + request->url());
     String bodyContent = getBodyContent(data, len);
 
     JsonDocument body;
     DeserializationError error = deserializeJson(body, bodyContent);
-    if (error)
-    {
+    if (error) {
         request->send(400);
         return;
     }
 
-    if (
-        body.containsKey("start_timestamp") && body.containsKey("end_timestamp"))
-    {
-
+    if (body.containsKey("start_timestamp") && body.containsKey("end_timestamp")) {
         preferencesManager.setStartTimestamp(body["start_timestamp"].as<int>());
         preferencesManager.setEndTimestamp(body["end_timestamp"].as<int>());
 
@@ -185,8 +176,7 @@ void ServerManager::updateDeepSleep(AsyncWebServerRequest *request, uint8_t *dat
     request->send(400);
 }
 
-JsonDocument ServerManager::createColorJson()
-{
+JsonDocument ServerManager::createColorJson() {
     JsonDocument colorData;
 
     colorData["hour_led1_color"] = hexToString(preferencesManager.getHourLed1Color());
@@ -199,24 +189,20 @@ JsonDocument ServerManager::createColorJson()
     return colorData;
 }
 
-uint32_t ServerManager::stringToHex(const String &hexColorString)
-{
+uint32_t ServerManager::stringToHex(const String &hexColorString) {
     String hexWithoutPrefix = hexColorString.substring(1);
     uint32_t hexColor = strtoul(hexWithoutPrefix.c_str(), NULL, 16);
     return hexColor;
 }
 
-String ServerManager::hexToString(uint32_t hexColor)
-{
+String ServerManager::hexToString(uint32_t hexColor) {
     String hexColorString = String(hexColor, HEX);
     return "#" + hexColorString;
 }
 
-String ServerManager::getBodyContent(uint8_t *data, size_t len)
-{
+String ServerManager::getBodyContent(uint8_t *data, size_t len) {
     String content = "";
-    for (size_t i = 0; i < len; i++)
-    {
+    for (size_t i = 0; i < len; i++) {
         content.concat((char)data[i]);
     }
     return content;

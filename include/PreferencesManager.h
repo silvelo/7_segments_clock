@@ -13,9 +13,9 @@
 #define MINUTES_LED_2_COLOR "ml2c"
 
 #include <Preferences.h>
-class PreferencesManager
-{
-public:
+#include <SPIFFS.h>
+class PreferencesManager {
+   public:
     static PreferencesManager &getInstance();
 
     void begin();
@@ -38,7 +38,7 @@ public:
     uint32_t getMinutesLed2Color();
     void setMinutesLed2Color(uint32_t color);
 
-private:
+   private:
     PreferencesManager() = default;
     PreferencesManager(const PreferencesManager &) = delete;
     PreferencesManager &operator=(const PreferencesManager &) = delete;
