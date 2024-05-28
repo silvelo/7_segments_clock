@@ -18,7 +18,7 @@ void LedManager::begin() {
     minutesStrip.begin();
     secondsStrip.begin();
     updateColorsFromPreferences();
-    Serial.println("Led Manager inicializado.");
+    Serial.println("Led Manager init...");
 }
 
 void LedManager::showHours(int hour) {

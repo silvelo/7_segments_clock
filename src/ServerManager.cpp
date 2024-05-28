@@ -16,7 +16,7 @@ void ServerManager::begin() {
     Serial.begin(115200);
 
     if (!SPIFFS.begin()) {
-        Serial.println("Error al montar el sistema de archivos");
+        Serial.println("Error mounting file system");
         return;
     }
 
@@ -144,8 +144,8 @@ void ServerManager::getDeepSleep(AsyncWebServerRequest *request) {
     Serial.println(String("[") + request->methodToString() + "] " + request->url());
     JsonDocument deepSleepData;
 
-    deepSleepData["start_timestamp"] = preferencesManager.getStartTimestamp();
-    deepSleepData["end_timestamp"] = preferencesManager.getEndTimestamp();
+    deepSleepData["start_timestamp"] = preferencesManager.getStartHour();
+    deepSleepData["end_timestamp"] = preferencesManager.getEndHour();
 
     String jsonString;
     serializeJson(deepSleepData, jsonString);
@@ -166,8 +166,8 @@ void ServerManager::updateDeepSleep(AsyncWebServerRequest *request, uint8_t *dat
     }
 
     if (body.containsKey("start_timestamp") && body.containsKey("end_timestamp")) {
-        preferencesManager.setStartTimestamp(body["start_timestamp"].as<int>());
-        preferencesManager.setEndTimestamp(body["end_timestamp"].as<int>());
+        preferencesManager.setStartHour(body["start_timestamp"]);
+        preferencesManager.setEndHour(body["end_timestamp"]);
 
         request->send(204);
         return;

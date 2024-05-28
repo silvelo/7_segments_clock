@@ -9,12 +9,12 @@ void PreferencesManager::begin() {
     Serial.begin(115200);
 
     if (!SPIFFS.begin()) {
-        Serial.println("Error al montar el sistema de archivos");
+        Serial.println("Error mounting file system");
         return;
     }
 
     preferences.begin(preferencesNamespace, false);
-    Serial.println("Preferences inicializado.");
+    Serial.println("Preferences init...");
 }
 
 int PreferencesManager::getTimeOffset() {
@@ -26,24 +26,24 @@ void PreferencesManager::setTimeOffset(int timeOffset) {
     preferences.putInt(TIME_OFFSET, timeOffset);
 }
 
-uint32_t PreferencesManager::getStartTimestamp() {
-    Serial.println("Get start timestamp");
-    return preferences.getUInt(START_TIMESTAMP);
+String PreferencesManager::getStartHour() {
+    Serial.println("Get start hour");
+    return preferences.getString(START_HOUR);
 }
 
-void PreferencesManager::setStartTimestamp(uint32_t startTimestamp) {
-    Serial.println("Set start timestamp: " + String(startTimestamp));
-    preferences.putUInt(START_TIMESTAMP, startTimestamp);
+void PreferencesManager::setStartHour(String startHour) {
+    Serial.println("Set start hour: " + startHour);
+    preferences.putString(START_HOUR, startHour);
 }
 
-uint32_t PreferencesManager::getEndTimestamp() {
-    Serial.println("Get end timestamp");
-    return preferences.getUInt(END_TIMESTAMP, 0);
+String PreferencesManager::getEndHour() {
+    Serial.println("Get end hour");
+    return preferences.getString(END_HOUR);
 }
 
-void PreferencesManager::setEndTimestamp(uint32_t endTimestamp) {
-    Serial.println("Set end timestamp: " + String(endTimestamp));
-    preferences.putUInt(END_TIMESTAMP, endTimestamp);
+void PreferencesManager::setEndHour(String endHour) {
+    Serial.println("Set end hour: " + endHour);
+    preferences.putString(END_HOUR, endHour);
 }
 
 uint32_t PreferencesManager::getHourLed1Color() {
