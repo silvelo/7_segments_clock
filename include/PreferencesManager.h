@@ -3,8 +3,8 @@
 
 #define DEFAULT_LED_COLOR 0xFFFFFF
 #define TIME_OFFSET "to"
-#define START_TIMESTAMP "st"
-#define END_TIMESTAMP "et"
+#define START_HOUR "st"
+#define END_HOUR "et"
 #define HOUR_LED_1_COLOR "hl1c"
 #define HOUR_LED_2_COLOR "hl2c"
 #define DOTS_LED_1_COLOR "dl1c"

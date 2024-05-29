@@ -5,6 +5,7 @@
 #include "ServerManager.h"
 #include "LedManager.h"
 #include "PreferencesManager.h"
+#include "ServerManager.h"
 #include "TimeManager.h"
 #include "SleepManager.h"
 
@@ -24,53 +25,67 @@ NTPClient timeClient(ntpUDP, "pool.ntp.org");
 void setup() {
     Serial.begin(115200);
     Serial.println();
+    void setup() {
+        Serial.begin(115200);
+        Serial.println();
 
-    WiFiManager wifiManager;
+        WiFiManager wifiManager;
+        WiFiManager wifiManager;
 
-    if (!wifiManager.autoConnect(apSSID)) {
-        Serial.println("Fallo al conectar. Reiniciando...");
-        delay(3000);
-        ESP.restart();
+        if (!wifiManager.autoConnect(apSSID)) {
+            Serial.println("Fallo al conectar. Reiniciando...");
+            delay(3000);
+            ESP.restart();
+        }
+
+        Serial.println("Conexión exitosa!");
+        Serial.print("Dirección IP: ");
+        Serial.println(WiFi.localIP());
+        Serial.println("Conexión exitosa!");
+        Serial.print("Dirección IP: ");
+        Serial.println(WiFi.localIP());
+
+        if (!SPIFFS.begin(true)) {
+            Serial.println("Error al inicializar SPIFFS");
+            return;
+        }
+
+        serverManager.begin();
+        preferencesManager.begin();
+        timeManager.begin();
+        sleepManager.begin();
+
+        AsyncWebServer *server = serverManager.getServer();
+        AsyncWebServer *server = serverManager.getServer();
+
+        ElegantOTA.begin(server);
+        ledManager.begin();
+        ElegantOTA.begin(server);
+        ledManager.begin();
     }
 
-    Serial.println("Conexión exitosa!");
-    Serial.print("Dirección IP: ");
-    Serial.println(WiFi.localIP());
+    void loop() {
+        ElegantOTA.loop();
+        timeManager.update();
+        void loop() {
+            ElegantOTA.loop();
+            timeManager.update();
 
-    if (!SPIFFS.begin(true)) {
-        Serial.println("Error al inicializar SPIFFS");
-        return;
-    }
+            bool isSleep = sleepManager.update(timeManager.getFormattedTime());
+            Serial.println("Is Sleep:" + String(isSleep));
+            if (isSleep) {
+                ledManager.end();
+            } else {
+                int hours = timeManager.getHours();
+                int minutes = timeManager.getMinutes();
 
-    serverManager.begin();
-    preferencesManager.begin();
-    timeManager.begin();
-    sleepManager.begin();
+                Serial.println(timeManager.getFormattedTime());
 
-    AsyncWebServer *server = serverManager.getServer();
+                ledManager.showHours(hours);
+                ledManager.showMinutes(minutes);
+                ledManager.showColon();
+            }
 
-    ElegantOTA.begin(server);
-    ledManager.begin();
-}
-
-void loop() {
-    ElegantOTA.loop();
-    timeManager.update();
-
-    bool isSleep = sleepManager.update(timeManager.getFormattedTime());
-    Serial.println("Is Sleep:" + String(isSleep));
-    if (isSleep) {
-        ledManager.end();
-    } else {
-        int hours = timeManager.getHours();
-        int minutes = timeManager.getMinutes();
-
-        Serial.println(timeManager.getFormattedTime());
-
-        ledManager.showHours(hours);
-        ledManager.showMinutes(minutes);
-        ledManager.showColon();
-    }
-
-    delay(1000);
-}
+            delay(1000);
+            delay(1000);
+        }

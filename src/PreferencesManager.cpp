@@ -9,12 +9,12 @@ void PreferencesManager::begin() {
     Serial.begin(115200);
 
     if (!SPIFFS.begin()) {
-        Serial.println("Error al montar el sistema de archivos");
+        Serial.println("Error mounting file system");
         return;
     }
 
     preferences.begin(preferencesNamespace, false);
-    Serial.println("Preferences inicializado.");
+    Serial.println("Preferences init...");
 }
 
 int PreferencesManager::getTimeOffset() {

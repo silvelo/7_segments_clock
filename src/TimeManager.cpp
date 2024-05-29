@@ -13,14 +13,14 @@ void TimeManager::begin() {
 
     if (timeClient == nullptr) {
         timeClient = new NTPClient(ntpUDP, "pool.ntp.org");
-        Serial.println("Cliente NTP inicializado.");
+        Serial.println("Cliente NTP init...");
     }
 
     timeClient->begin();
 
     setTimeOffset(preferencesManager.getTimeOffset());
 
-    Serial.println("Time Manager inicializado.");
+    Serial.println("Time Manager init...");
 }
 
 void TimeManager::update() {
