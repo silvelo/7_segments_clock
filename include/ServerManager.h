@@ -8,6 +8,7 @@
 
 #include "LedManager.h"
 #include "PreferencesManager.h"
+#include "SleepManager.h"
 #include "TimeManager.h"
 
 #define MIME_APPLICATION_JSON "application/json"
@@ -27,6 +28,7 @@ class ServerManager {
     AsyncWebServer server;
     PreferencesManager &preferencesManager;
     LedManager &ledManager;
+    SleepManager &sleepManager;
     TimeManager &timeManager;
 
     void getColors(AsyncWebServerRequest *request);

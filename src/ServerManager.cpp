@@ -9,6 +9,7 @@ ServerManager::ServerManager()
     : server(80),
       preferencesManager(PreferencesManager::getInstance()),
       ledManager(LedManager::getInstance()),
+      sleepManager(SleepManager::getInstance()),
       timeManager(TimeManager::getInstance()) {
 }
 
@@ -166,9 +167,9 @@ void ServerManager::updateDeepSleep(AsyncWebServerRequest *request, uint8_t *dat
     }
 
     if (body.containsKey("start_timestamp") && body.containsKey("end_timestamp")) {
-        preferencesManager.setStartTimestamp(body["start_timestamp"].as<int>());
-        preferencesManager.setEndTimestamp(body["end_timestamp"].as<int>());
-
+        preferencesManager.setStartTimestamp(body["start_timestamp"]);
+        preferencesManager.setEndTimestamp(body["end_timestamp"]);
+        sleepManager.setHours();
         request->send(204);
         return;
     }

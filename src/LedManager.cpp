@@ -21,6 +21,16 @@ void LedManager::begin() {
     Serial.println("Led Manager inicializado.");
 }
 
+void LedManager::end() {
+    hoursStrip.clear();
+    minutesStrip.clear();
+    secondsStrip.clear();
+
+    hoursStrip.show();
+    minutesStrip.show();
+    secondsStrip.show();
+}
+
 void LedManager::showHours(int hour) {
     this->showHourDigit(hour % 10, 0, this->hourColor1);
     this->showHourDigit(hour / 10, NUM_PIXELS / 2, this->hourColor2);
