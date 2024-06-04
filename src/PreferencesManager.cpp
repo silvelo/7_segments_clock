@@ -26,24 +26,24 @@ void PreferencesManager::setTimeOffset(int timeOffset) {
     preferences.putInt(TIME_OFFSET, timeOffset);
 }
 
-String PreferencesManager::getStartTimestamp() {
+String PreferencesManager::getStarHour() {
     Serial.println("Get start timestamp");
-    return preferences.getString(START_TIMESTAMP);
+    return preferences.getString(START_HOUR);
 }
 
-void PreferencesManager::setStartTimestamp(String startTimestamp) {
-    Serial.println("Set start timestamp: " + startTimestamp);
-    preferences.putString(START_TIMESTAMP, startTimestamp);
+void PreferencesManager::setStartHour(String startHour) {
+    Serial.println("Set start timestamp: " + startHour);
+    preferences.putString(START_HOUR, startHour);
 }
 
-String PreferencesManager::getEndTimestamp() {
+String PreferencesManager::getEndHour() {
     Serial.println("Get end timestamp");
-    return preferences.getString(END_TIMESTAMP);
+    return preferences.getString(END_HOUR);
 }
 
-void PreferencesManager::setEndTimestamp(String endTimestamp) {
-    Serial.println("Set end timestamp: " + endTimestamp);
-    preferences.putString(END_TIMESTAMP, endTimestamp);
+void PreferencesManager::setEndHour(String EndHour) {
+    Serial.println("Set end timestamp: " + EndHour);
+    preferences.putString(END_HOUR, EndHour);
 }
 
 uint32_t PreferencesManager::getHourLed1Color() {

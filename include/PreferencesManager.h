@@ -22,9 +22,10 @@ class PreferencesManager {
     int getTimeOffset();
     void setTimeOffset(int timeOffset);
     String getStartTimestamp();
-    void setStartTimestamp(String startTimestamp);
-    String getEndTimestamp();
-    void setEndTimestamp(String endTimestamp);
+    void setStartHour(String startTimestamp);
+    String getStarHour();
+    void setEndHour(String endTimestamp);
+    String getEndHour();
     uint32_t getHourLed1Color();
     void setHourLed1Color(uint32_t color);
     uint32_t getHourLed2Color();
