@@ -17,8 +17,8 @@ void SleepManager::begin() {
 }
 
 void SleepManager::setHours() {
-    startHour = preferencesManager.getStartTimestamp();
-    endHour = preferencesManager.getEndTimestamp();
+    startHour = preferencesManager.getStarHour();
+    endHour = preferencesManager.getEndHour();
 }
 
 bool SleepManager::update(String actualDate) {
