@@ -10,18 +10,18 @@
 #define NUM_PIXELS 28
 #define SECOND_NUM_PIXELS 2
 
-class LedManager
-{
-public:
+class LedManager {
+   public:
     static LedManager &getInstance();
 
     void begin();
+    void end();
     void showHours(int hour);
     void showMinutes(int minutes);
     void showColon();
     void updateColorsFromPreferences();
 
-private:
+   private:
     LedManager();
     LedManager(const LedManager &) = delete;
     LedManager &operator=(const LedManager &) = delete;

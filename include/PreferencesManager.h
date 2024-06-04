@@ -3,8 +3,8 @@
 
 #define DEFAULT_LED_COLOR 0xFFFFFF
 #define TIME_OFFSET "to"
-#define START_TIMESTAMP "st"
-#define END_TIMESTAMP "et"
+#define START_HOUR "st"
+#define END_HOUR "et"
 #define HOUR_LED_1_COLOR "hl1c"
 #define HOUR_LED_2_COLOR "hl2c"
 #define DOTS_LED_1_COLOR "dl1c"
@@ -21,10 +21,10 @@ class PreferencesManager {
     void begin();
     int getTimeOffset();
     void setTimeOffset(int timeOffset);
-    uint32_t getStartTimestamp();
-    void setStartTimestamp(uint32_t startTimestamp);
-    uint32_t getEndTimestamp();
-    void setEndTimestamp(uint32_t endTimestamp);
+    String getStartTimestamp();
+    void setStartTimestamp(String startTimestamp);
+    String getEndTimestamp();
+    void setEndTimestamp(String endTimestamp);
     uint32_t getHourLed1Color();
     void setHourLed1Color(uint32_t color);
     uint32_t getHourLed2Color();
