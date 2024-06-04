@@ -3,8 +3,8 @@
 
 #define DEFAULT_LED_COLOR 0xFFFFFF
 #define TIME_OFFSET "to"
-#define START_TIMESTAMP "st"
-#define END_TIMESTAMP "et"
+#define START_HOUR "st"
+#define END_HOUR "et"
 #define HOUR_LED_1_COLOR "hl1c"
 #define HOUR_LED_2_COLOR "hl2c"
 #define DOTS_LED_1_COLOR "dl1c"
@@ -13,18 +13,18 @@
 #define MINUTES_LED_2_COLOR "ml2c"
 
 #include <Preferences.h>
-class PreferencesManager
-{
-public:
+#include <SPIFFS.h>
+class PreferencesManager {
+   public:
     static PreferencesManager &getInstance();
 
     void begin();
     int getTimeOffset();
     void setTimeOffset(int timeOffset);
-    uint32_t getStartTimestamp();
-    void setStartTimestamp(uint32_t startTimestamp);
-    uint32_t getEndTimestamp();
-    void setEndTimestamp(uint32_t endTimestamp);
+    String getStartTimestamp();
+    void setStartTimestamp(String startTimestamp);
+    String getEndTimestamp();
+    void setEndTimestamp(String endTimestamp);
     uint32_t getHourLed1Color();
     void setHourLed1Color(uint32_t color);
     uint32_t getHourLed2Color();
@@ -38,7 +38,7 @@ public:
     uint32_t getMinutesLed2Color();
     void setMinutesLed2Color(uint32_t color);
 
-private:
+   private:
     PreferencesManager() = default;
     PreferencesManager(const PreferencesManager &) = delete;
     PreferencesManager &operator=(const PreferencesManager &) = delete;

@@ -1,0 +1,69 @@
+on:
+  push:
+    branches:
+      - main
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Set up python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.x"
+          architecture: "x64"
+
+      - name: Install PlatformIO
+        run: python3 -m pip install platformio==6.1.13
+
+      - name: Build firmwares
+        run: FIRMWARE_VERSION=${{github.ref_name}} platformio run
+
+      - name: Build spiffs
+        run: FIRMWARE_VERSION=${{github.ref_name}} platformio run -t buildfs
+
+      - name: Firmware
+        uses: actions/upload-artifact@v4
+        with:
+          name: firmware
+          path: .pio/build/*/firmware.bin
+          retention-days: 1
+      - name: spiffs
+        uses: actions/upload-artifact@v4
+        with:
+          name: spiffs
+          path: .pio/build/*/spiffs.bin
+          retention-days: 1
+  release:
+    name: Release
+    needs:
+      - build
+    permissions:
+      contents: write
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Bump version and push tag
+        id: tag_version
+        uses: mathieudutour/github-tag-action@v6.2
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Download artifacts
+        uses: actions/download-artifact@v4
+      - name: release
+        uses: ncipollo/release-action@v1
+        with:
+          makeLatest: true
+          artifacts: "firmware/*/firmware.bin,spiffs/*/spiffs.bin"
+          tag: ${{ steps.tag_version.outputs.new_tag }}
+          name: Release ${{ steps.tag_version.outputs.new_tag }}
+          body: ${{ steps.tag_version.outputs.changelog }}
+      - name: Commit CHANGELOG.md
+        uses: stefanzweifel/git-auto-commit-action@v4
+        with:
+          branch: main
+          commit_message: "docs: update CHANGELOG.md for ${{ github.ref_name }} [skip ci]"
+          file_pattern: CHANGELOG.md

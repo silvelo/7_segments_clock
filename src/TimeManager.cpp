@@ -1,56 +1,47 @@
 #include "TimeManager.h"
 
-TimeManager &TimeManager::getInstance()
-{
+TimeManager &TimeManager::getInstance() {
     static TimeManager instance;
     return instance;
 }
 
-TimeManager::TimeManager()
-    : preferencesManager(PreferencesManager::getInstance())
-{
+TimeManager::TimeManager() : preferencesManager(PreferencesManager::getInstance()) {
 }
 
-void TimeManager::begin()
-{
+void TimeManager::begin() {
     Serial.begin(115200);
 
-    if (timeClient == nullptr)
-    {
+    if (timeClient == nullptr) {
         timeClient = new NTPClient(ntpUDP, "pool.ntp.org");
-        Serial.println("Cliente NTP inicializado.");
+        Serial.println("Cliente NTP init...");
     }
-    int timeOffset = preferencesManager.getTimeOffset();
-    timeClient->setTimeOffset(timeOffset);
+
     timeClient->begin();
 
-    Serial.println("Time Manager inicializado.");
+    setTimeOffset(preferencesManager.getTimeOffset());
+
+    Serial.println("Time Manager init...");
 }
 
-void TimeManager::update()
-{
+void TimeManager::update() {
     timeClient->update();
 }
 
-int TimeManager::getHours()
-{
+int TimeManager::getHours() {
     Serial.println("Get Hours");
     return timeClient->getHours();
 }
 
-int TimeManager::getMinutes()
-{
+int TimeManager::getMinutes() {
     Serial.println("Get Minutes");
     return timeClient->getMinutes();
 }
 
-void TimeManager::setTimeOffset(int offset)
-{
+void TimeManager::setTimeOffset(int offset) {
     Serial.println("Change Time Offset");
-    timeClient->setTimeOffset(offset);
+    timeClient->setTimeOffset(offset * 3600);
 }
 
-String TimeManager::getFormattedTime()
-{
+String TimeManager::getFormattedTime() {
     return timeClient->getFormattedTime();
 }
