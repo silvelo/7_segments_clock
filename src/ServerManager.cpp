@@ -145,7 +145,7 @@ void ServerManager::getDeepSleep(AsyncWebServerRequest *request) {
     Serial.println(String("[") + request->methodToString() + "] " + request->url());
     JsonDocument deepSleepData;
 
-    deepSleepData["start_timestamp"] = preferencesManager.getStartHour();
+    deepSleepData["start_timestamp"] = preferencesManager.getStarHour();
     deepSleepData["end_timestamp"] = preferencesManager.getEndHour();
 
     String jsonString;
@@ -167,8 +167,8 @@ void ServerManager::updateDeepSleep(AsyncWebServerRequest *request, uint8_t *dat
     }
 
     if (body.containsKey("start_timestamp") && body.containsKey("end_timestamp")) {
-        preferencesManager.setStartTimestamp(body["start_timestamp"]);
-        preferencesManager.setEndTimestamp(body["end_timestamp"]);
+        preferencesManager.setStartHour(body["start_timestamp"]);
+        preferencesManager.setEndHour(body["end_timestamp"]);
         sleepManager.setHours();
         request->send(204);
         return;
