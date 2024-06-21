@@ -77,11 +77,14 @@ void LedManager::showHourDigit(int number, int startPixel, uint32_t color) {
 void LedManager::showMinuteDigit(int number, int startPixel, uint32_t color) {
     for (int i = 0; i < 7; i++) {
         if (minuteSegments[number][i]) {
-            minutesStrip.setPixelColor(startPixel + (i * 2), color);
-            minutesStrip.setPixelColor(startPixel + (i * 2) + 1, color);
+            
+            for(int j = 0; j < NUM_LEDS; j++){
+                minutesStrip.setPixelColor(startPixel + (i * NUM_LEDS) + j, color);
+            }
         } else {
-            minutesStrip.setPixelColor(startPixel + (i * 2), minutesStrip.Color(0, 0, 0));
-            minutesStrip.setPixelColor(startPixel + (i * 2) + 1, minutesStrip.Color(0, 0, 0));
+            for(int j = 0; j < NUM_LEDS; j++){
+                minutesStrip.setPixelColor(startPixel + (i * NUM_LEDS) + j, minutesStrip.Color(0, 0, 0));
+            }
         }
     }
 }
