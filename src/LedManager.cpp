@@ -63,11 +63,13 @@ void LedManager::updateColorsFromPreferences() {
 void LedManager::showHourDigit(int number, int startPixel, uint32_t color) {
     for (int i = 0; i < 7; i++) {
         if (hourSegments[number][i]) {
-            hoursStrip.setPixelColor(startPixel + (i * 2), color);
-            hoursStrip.setPixelColor(startPixel + (i * 2) + 1, color);
+            for(int j = 0; j < NUM_LEDS; j++){
+                hoursStrip.setPixelColor(startPixel + (i * NUM_LEDS) + j, color);
+            }
         } else {
-            hoursStrip.setPixelColor(startPixel + (i * 2), hoursStrip.Color(0, 0, 0));
-            hoursStrip.setPixelColor(startPixel + (i * 2) + 1, hoursStrip.Color(0, 0, 0));
+            for(int j = 0; j < NUM_LEDS; j++){
+                hoursStrip.setPixelColor(startPixel + (i * NUM_LEDS) + j, hoursStrip.Color(0, 0, 0));
+            }
         }
     }
 }

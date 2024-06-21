@@ -9,6 +9,7 @@
 #define HOUR_PIN 17
 #define NUM_PIXELS 28
 #define SECOND_NUM_PIXELS 2
+#define NUM_LEDS 2
 
 class LedManager {
    public:
