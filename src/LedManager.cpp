@@ -46,8 +46,11 @@ void LedManager::showMinutes(int minutes) {
 }
 
 void LedManager::showColon() {
-    secondsStrip.setPixelColor(0, this->dotsColor1);
-    secondsStrip.setPixelColor(1, this->dotsColor2);
+    for(int i = 0; i < SECOND_NUM_PIXELS; i++){
+        secondsStrip.setPixelColor(i, this->dotsColor1);
+        secondsStrip.setPixelColor(i + (i*SECOND_NUM_PIXELS), this->dotsColor2);
+    }
+
     secondsStrip.show();
 }
 

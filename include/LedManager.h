@@ -7,9 +7,9 @@
 #define MINUTE_PIN 16
 #define SECOND_PIN 18
 #define HOUR_PIN 17
-#define NUM_PIXELS 28
-#define SECOND_NUM_PIXELS 2
-#define NUM_LEDS 2
+#define NUM_PIXELS 28 // Total led per block (hour and minute)
+#define SECOND_NUM_PIXELS 1 // Led per dot
+#define NUM_LEDS 2 // Led per segment
 
 class LedManager {
    public:
