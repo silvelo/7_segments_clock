@@ -21,6 +21,8 @@ class LedManager {
     void begin();
     void end();
     void showHours(int hour);
+    void showHoursTest(int hour);
+    void showMinutesTest(int minutes);
     void showMinutes(int minutes);
     void showColon();
     void updateColorsFromPreferences();
@@ -54,25 +56,25 @@ class LedManager {
         {true, true, true, true, true, true, false},
     };
 
-    /*  bool minuteSegments[10][7] = {
-         {true, true, true, false, true, true, true},
-         {false, false, true, false, false, false, true},
-         {true, true, false, true, false, true, true},
-         {false, true, true, true, false, true, true},
-         {false, false, true, true, true, false, true},
-         {false, true, true, true, true, true, false},
-         {true, true, true, true, true, true, false},
-         {false, false, true, false, false, true, true},
-         {true, true, true, true, true, true, true},
-         {false, true, true, true, true, true, true},
-     }; */
+    /*     bool minuteSegments[10][7] = {
+            {true, true, true, false, true, true, true},
+            {false, false, true, false, false, false, true},
+            {true, true, false, true, false, true, true},
+            {false, true, true, true, false, true, true},
+            {false, false, true, true, true, false, true},
+            {false, true, true, true, true, true, false},
+            {true, true, true, true, true, true, false},
+            {false, false, true, false, false, true, true},
+            {true, true, true, true, true, true, true},
+            {false, true, true, true, true, true, true},
+        }; */
 
     bool minuteSegments[10][7] = {
         {true, true, true, false, true, true, true},
         {false, false, true, false, false, false, true},
         {false, true, true, true, true, true, false},
         {false, true, true, true, false, true, true},
-        {true, false, true, true, false, true, true},
+        {true, false, true, true, false, false, true},
         {true, true, false, true, false, true, true},
         {true, true, false, true, true, true, true},
         {false, true, true, false, false, false, true},

@@ -13,6 +13,7 @@
 #define MINUTES_LED_1_COLOR "ml1c"
 #define MINUTES_LED_2_COLOR "ml2c"
 #define LEDS_PER_SEGMENT "lps"
+#define DEBUG "debug"
 
 #include <Preferences.h>
 #include <SPIFFS.h>
@@ -42,6 +43,8 @@ class PreferencesManager {
     void setMinutesLed2Color(uint32_t color);
     int getLedsPerSegment();
     void setLedsPerSegment(int numLeds);
+    bool getDebug();
+    void setDebug(bool debug);
 
    private:
     PreferencesManager() = default;

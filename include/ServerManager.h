@@ -34,6 +34,9 @@ class ServerManager {
     void getColors(AsyncWebServerRequest *request);
     void updateColors(AsyncWebServerRequest *request, uint8_t *data, size_t len, size_t index,
                       size_t total);
+    void getDebug(AsyncWebServerRequest *request);
+    void updateDebug(AsyncWebServerRequest *request, uint8_t *data, size_t len, size_t index,
+                     size_t total);
     void getLedsPerSegment(AsyncWebServerRequest *request);
     void updateLedsPerSegment(AsyncWebServerRequest *request, uint8_t *data, size_t len,
                               size_t index, size_t total);

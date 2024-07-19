@@ -1,10 +1,13 @@
 window.onload = onLoad
 
+debugMode = false;
+
 function onLoad() {
     getColors();
     getDeepSleep();
     getLedsPerSegment();
     getTimeZone();
+    getDebug()
 }
 
 function getColors() {
@@ -31,6 +34,20 @@ async function setColors(event){
     const formElement = document.getElementById("colorsForm")
 
     await setData("/colors", formElement);
+}
+
+function getDebug() {
+    fetch("/debug")
+        .then((response) => response.json())
+        .then((data) => {
+            debugMode =            data.debug;
+        });
+}
+
+async function setDebug(){
+    debugMode = !debugMode;
+    console.log(debugMode)
+    await makePost("/debug", {debug: debugMode});
 }
 
 function getLedsPerSegment() {
@@ -83,6 +100,21 @@ async function setDeepSleep(event){
     await setData("/deep-sleep", formElement);
 
 }
+
+async function makePost(url, data) {
+    try {
+      const response = await fetch(url, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      });
+      //console.log(await response.json());
+    } catch (e) {
+      console.error(e);
+    }
+  }
 
 async function setData(url, formElement) {
   const formData = new FormData(formElement);
