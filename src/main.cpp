@@ -60,21 +60,27 @@ void setup() {
 void loop() {
     ElegantOTA.loop();
     timeManager.update();
-
-    bool isSleep = sleepManager.update(timeManager.getFormattedTime());
-    if (isSleep) {
-        Serial.println("Is Sleep:" + String(isSleep));
-        ledManager.end();
+    if (preferencesManager.getDebug()) {
+        for (int i = 0; i < 10; i++) {
+            ledManager.showHoursTest(i);
+            ledManager.showMinutesTest(i);
+            delay(1000);
+        }
     } else {
-        int hours = timeManager.getHours();
-        int minutes = timeManager.getMinutes();
-        // int minutes = timeManager.getSeconds();
+        bool isSleep = sleepManager.update(timeManager.getFormattedTime());
+        if (isSleep) {
+            Serial.println("Is Sleep:" + String(isSleep));
+            ledManager.end();
+        } else {
+            int hours = timeManager.getHours();
+            int minutes = timeManager.getMinutes();
 
-        Serial.println(timeManager.getFormattedTime());
+            Serial.println(timeManager.getFormattedTime());
 
-        ledManager.showHours(hours);
-        ledManager.showMinutes(minutes);
-        ledManager.showColon();
+            ledManager.showHours(hours);
+            ledManager.showMinutes(minutes);
+            ledManager.showColon();
+        }
     }
 
     delay(1000);

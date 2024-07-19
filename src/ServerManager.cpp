@@ -25,12 +25,18 @@ void ServerManager::begin() {
 
     server.on("/colors", HTTP_GET,
               std::bind(&ServerManager::getColors, this, std::placeholders::_1));
+    server.on("/debug", HTTP_GET, std::bind(&ServerManager::getDebug, this, std::placeholders::_1));
     server.on("/leds", HTTP_GET,
               std::bind(&ServerManager::getLedsPerSegment, this, std::placeholders::_1));
     server.on("/timezone", HTTP_GET,
               std::bind(&ServerManager::getTimezone, this, std::placeholders::_1));
     server.on("/deep-sleep", HTTP_GET,
               std::bind(&ServerManager::getDeepSleep, this, std::placeholders::_1));
+
+    server.on(
+        "/debug", HTTP_POST, [](AsyncWebServerRequest *request) {}, NULL,
+        std::bind(&ServerManager::updateDebug, this, std::placeholders::_1, std::placeholders::_2,
+                  std::placeholders::_3, std::placeholders::_4, std::placeholders::_5));
 
     server.on(
         "/colors", HTTP_POST, [](AsyncWebServerRequest *request) {}, NULL,
@@ -140,6 +146,40 @@ void ServerManager::updateLedsPerSegment(AsyncWebServerRequest *request, uint8_t
         int ledsPerSegment = body["ledsPerSegment"].as<int>();
         preferencesManager.setLedsPerSegment(ledsPerSegment);
         ledManager.updateSegmentsFromPreferences();
+        request->send(204);
+        return;
+    }
+
+    request->send(400);
+}
+
+void ServerManager::getDebug(AsyncWebServerRequest *request) {
+    Serial.println(String("[") + request->methodToString() + "] " + request->url());
+    JsonDocument debugData;
+
+    debugData["debug"] = preferencesManager.getDebug();
+
+    String jsonString;
+    serializeJson(debugData, jsonString);
+
+    request->send(200, MIME_APPLICATION_JSON, jsonString);
+}
+
+void ServerManager::updateDebug(AsyncWebServerRequest *request, uint8_t *data, size_t len,
+                                size_t index, size_t total) {
+    Serial.println(String("[") + request->methodToString() + "] " + request->url());
+    String bodyContent = getBodyContent(data, len);
+
+    JsonDocument body;
+    DeserializationError error = deserializeJson(body, bodyContent);
+    if (error) {
+        request->send(400);
+        return;
+    }
+
+    if (body.containsKey("debug")) {
+        bool debug = body["debug"].as<bool>();
+        preferencesManager.setDebug(debug);
         request->send(204);
         return;
     }

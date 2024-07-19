@@ -98,6 +98,13 @@ int PreferencesManager::getLedsPerSegment() {
     return preferences.getInt(LEDS_PER_SEGMENT, DEFAULT_LEDS_PER_SEGMENT);
 }
 
+bool PreferencesManager::getDebug() {
+    return preferences.getBool(DEBUG, false);
+}
+void PreferencesManager::setDebug(boolean debug) {
+    preferences.putBool(DEBUG, debug);
+}
+
 void PreferencesManager::setLedsPerSegment(int numLeds) {
     preferences.putInt(LEDS_PER_SEGMENT, numLeds);
 }
