@@ -62,12 +62,13 @@ void loop() {
     timeManager.update();
 
     bool isSleep = sleepManager.update(timeManager.getFormattedTime());
-    Serial.println("Is Sleep:" + String(isSleep));
     if (isSleep) {
+        Serial.println("Is Sleep:" + String(isSleep));
         ledManager.end();
     } else {
         int hours = timeManager.getHours();
         int minutes = timeManager.getMinutes();
+        // int minutes = timeManager.getSeconds();
 
         Serial.println(timeManager.getFormattedTime());
 

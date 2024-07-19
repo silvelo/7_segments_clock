@@ -37,6 +37,11 @@ int TimeManager::getMinutes() {
     return timeClient->getMinutes();
 }
 
+int TimeManager::getSeconds() {
+    Serial.println("Get Seconds");
+    return timeClient->getSeconds();
+}
+
 void TimeManager::setTimeOffset(int offset) {
     Serial.println("Change Time Offset");
     timeClient->setTimeOffset(offset * 3600);

@@ -22,6 +22,9 @@ void SleepManager::setHours() {
 }
 
 bool SleepManager::update(String actualDate) {
+    if (startHour == "" || endHour == "") {
+        return false;
+    }
     std::pair<bool, int> result = isCurrentTimeBetween(actualDate, startHour, endHour);
     return result.first;
 }

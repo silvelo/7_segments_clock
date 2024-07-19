@@ -13,6 +13,7 @@ class TimeManager {
     void update();
     int getHours();
     int getMinutes();
+    int getSeconds();
     String getFormattedTime();
     void setTimeOffset(int offset);
 

@@ -90,10 +90,25 @@ void LedManager::showHourDigit(int number, int startPixel, uint32_t color) {
 }
 
 void LedManager::showMinuteDigit(int number, int startPixel, uint32_t color) {
+    Serial.println("Number " + String(number));
     for (int i = 0; i < MINUTE_SEGMENT; i++) {
+        Serial.println("Segment number " + String(i));
         if (minuteSegments[number][i]) {
+            Serial.println("Power On pixels:");
             for (int j = 0; j < ledsPerSegment; j++) {
+                Serial.print("[");
+                Serial.print(" Start Pixel: ");
+                Serial.print(startPixel);
+                Serial.print(" i: ");
+                Serial.print(i);
+                Serial.print(" ledsPerSegment: ");
+                Serial.print(ledsPerSegment);
+                Serial.print(" j: ");
+                Serial.print(j);
+                Serial.print("] - ");
+                Serial.print(startPixel + (i * ledsPerSegment) + j);
                 minutesStrip.setPixelColor(startPixel + (i * ledsPerSegment) + j, color);
+                Serial.println();
             }
         } else {
             for (int j = 0; j < ledsPerSegment; j++) {
@@ -101,5 +116,6 @@ void LedManager::showMinuteDigit(int number, int startPixel, uint32_t color) {
                                            minutesStrip.Color(0, 0, 0));
             }
         }
+        Serial.println();
     }
 }
