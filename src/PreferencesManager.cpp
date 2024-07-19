@@ -93,3 +93,11 @@ uint32_t PreferencesManager::getMinutesLed2Color() {
 void PreferencesManager::setMinutesLed2Color(uint32_t color) {
     preferences.putUInt(MINUTES_LED_2_COLOR, color);
 }
+
+int PreferencesManager::getLedsPerSegment() {
+    return preferences.getInt(LEDS_PER_SEGMENT, DEFAULT_LEDS_PER_SEGMENT);
+}
+
+void PreferencesManager::setLedsPerSegment(int numLeds) {
+    preferences.putInt(LEDS_PER_SEGMENT, numLeds);
+}

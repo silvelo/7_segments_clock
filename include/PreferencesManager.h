@@ -2,6 +2,7 @@
 #define PREFERENCES_MANAGER_H
 
 #define DEFAULT_LED_COLOR 0xFFFFFF
+#define DEFAULT_LEDS_PER_SEGMENT 2
 #define TIME_OFFSET "to"
 #define START_HOUR "st"
 #define END_HOUR "et"
@@ -11,6 +12,7 @@
 #define DOTS_LED_2_COLOR "dl2c"
 #define MINUTES_LED_1_COLOR "ml1c"
 #define MINUTES_LED_2_COLOR "ml2c"
+#define LEDS_PER_SEGMENT "lps"
 
 #include <Preferences.h>
 #include <SPIFFS.h>
@@ -38,6 +40,8 @@ class PreferencesManager {
     void setMinutesLed1Color(uint32_t color);
     uint32_t getMinutesLed2Color();
     void setMinutesLed2Color(uint32_t color);
+    int getLedsPerSegment();
+    void setLedsPerSegment(int numLeds);
 
    private:
     PreferencesManager() = default;

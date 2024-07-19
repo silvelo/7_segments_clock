@@ -7,9 +7,12 @@
 #define MINUTE_PIN 16
 #define SECOND_PIN 18
 #define HOUR_PIN 17
-#define NUM_PIXELS 28 // Total led per block (hour and minute)
-#define SECOND_NUM_PIXELS 1 // Led per dot
-#define NUM_LEDS 2 // Led per segment
+#define HOUR_DIGITS 2
+#define SECOND_DIGITS 2
+#define MINUTE_DIGITS 2
+#define HOUR_SEGMENT 7
+#define MINUTE_SEGMENT 7
+#define SECOND_SEGMENT 1
 
 class LedManager {
    public:
@@ -21,6 +24,7 @@ class LedManager {
     void showMinutes(int minutes);
     void showColon();
     void updateColorsFromPreferences();
+    void updateSegmentsFromPreferences();
 
    private:
     LedManager();
@@ -33,7 +37,7 @@ class LedManager {
     Adafruit_NeoPixel minutesStrip;
     Adafruit_NeoPixel secondsStrip;
     uint32_t hourColor1, hourColor2, minuteColor1, minuteColor2, dotsColor1, dotsColor2;
-
+    int hoursLength, minutesLength, secondsLength, ledsPerSegment;
     void showHourDigit(int number, int startPixel, uint32_t color);
     void showMinuteDigit(int number, int startPixel, uint32_t color);
 
