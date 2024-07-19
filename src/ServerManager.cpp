@@ -116,7 +116,7 @@ void ServerManager::getLedsPerSegment(AsyncWebServerRequest *request) {
     Serial.println(String("[") + request->methodToString() + "] " + request->url());
     JsonDocument ledsPerSegmentData;
 
-    ledsPerSegmentData['ledsPerSegment'] = preferencesManager.getLedsPerSegment();
+    ledsPerSegmentData["ledsPerSegment"] = preferencesManager.getLedsPerSegment();
 
     String jsonString;
     serializeJson(ledsPerSegmentData, jsonString);
