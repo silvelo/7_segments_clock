@@ -4,6 +4,7 @@ function onLoad() {
     getColors();
     getDeepSleep();
     getTimeZone();
+    getLedsPerSegment();
 }
 
 function getColors() {
