@@ -56,6 +56,44 @@
           />
         </form>
       </div>
+      <div
+        class="relative flex flex-col rounded-xl bg-slate-200 bg-clip-border text-gray-700 shadow-none mx-4 p-4 align-center w-[550px]"
+      >
+        <h4
+          class="block font-sans text-2xl font-semibold leading-snug tracking-normal text-blue-gray-900 antialiased"
+        >
+          Leds
+        </h4>
+        <p
+          class="mt-1 block font-sans text-base font-normal leading-relaxed text-gray-700 antialiased"
+        >
+        Per Segment
+        </p>
+        <form id="ledsPerSegmentForm" class="color_form" onsubmit="setLedsPerSegment(event)">
+          <label
+            for="ledsPerSegment"
+            class="mb-3 block text-base font-medium text-[#07074D]"
+            >Leds Per segment:</label
+          >
+          <input
+            type="number"
+            min="0"
+            id="ledsPerSegment"
+            name="ledsPerSegment"
+            class="w-full rounded-md border border-[#e0e0e0] bg-white py-3 px-6 text-base font-medium text-[#6B7280] outline-none focus:border-[#6A64F1] focus:shadow-md"
+          />
+          <span
+            class="flex items-center font-medium tracking-wide text-xs mt-1 ml-1"
+          >
+            
+          </span>
+          <input
+            class="mt-5 middle w-full none center rounded-lg bg-pink-500 py-3 px-6 font-sans text-xs font-bold uppercase text-white shadow-md shadow-pink-500/20 transition-all hover:shadow-lg hover:shadow-pink-500/40 focus:opacity-[0.85] focus:shadow-none active:opacity-[0.85] active:shadow-none disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none"
+            type="submit"
+            value="Set Leds Per Segment"
+          />
+        </form>
+      </div>
 
       <div
         class="relative flex flex-col rounded-xl bg-slate-200 bg-clip-border text-gray-700 shadow-none mx-4 p-4 align-center w-[550px]"

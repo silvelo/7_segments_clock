@@ -32,6 +32,23 @@ async function setColors(event){
     await setData("/colors", formElement);
 }
 
+function getLedsPerSegment() {
+    fetch("/leds")
+        .then((response) => response.json())
+        .then((data) => {
+
+            document.getElementById("ledsPerSegment").value =
+                data.ledsPerSegment;
+        });
+}
+
+async function setLedsPerSegment(event){
+    event.preventDefault();
+    const formElement = document.getElementById("ledsPerSegmentForm")
+   
+    await setData("/leds", formElement);    
+}
+
 function getTimeZone() {
     fetch("/timezone")
         .then((response) => response.json())

@@ -25,6 +25,8 @@ void ServerManager::begin() {
 
     server.on("/colors", HTTP_GET,
               std::bind(&ServerManager::getColors, this, std::placeholders::_1));
+    server.on("/leds", HTTP_GET,
+              std::bind(&ServerManager::getLedsPerSegment, this, std::placeholders::_1));
     server.on("/timezone", HTTP_GET,
               std::bind(&ServerManager::getTimezone, this, std::placeholders::_1));
     server.on("/deep-sleep", HTTP_GET,
@@ -37,6 +39,11 @@ void ServerManager::begin() {
     server.on(
         "/timezone", HTTP_POST, [](AsyncWebServerRequest *request) {}, NULL,
         std::bind(&ServerManager::updateTimezone, this, std::placeholders::_1,
+                  std::placeholders::_2, std::placeholders::_3, std::placeholders::_4,
+                  std::placeholders::_5));
+    server.on(
+        "/leds", HTTP_POST, [](AsyncWebServerRequest *request) {}, NULL,
+        std::bind(&ServerManager::updateLedsPerSegment, this, std::placeholders::_1,
                   std::placeholders::_2, std::placeholders::_3, std::placeholders::_4,
                   std::placeholders::_5));
     server.on(
@@ -98,6 +105,41 @@ void ServerManager::updateColors(AsyncWebServerRequest *request, uint8_t *data, 
 
         ledManager.updateColorsFromPreferences();
 
+        request->send(204);
+        return;
+    }
+
+    request->send(400);
+}
+
+void ServerManager::getLedsPerSegment(AsyncWebServerRequest *request) {
+    Serial.println(String("[") + request->methodToString() + "] " + request->url());
+    JsonDocument ledsPerSegmentData;
+
+    ledsPerSegmentData['ledsPerSegment'] = preferencesManager.getLedsPerSegment();
+
+    String jsonString;
+    serializeJson(ledsPerSegmentData, jsonString);
+
+    request->send(200, MIME_APPLICATION_JSON, jsonString);
+}
+
+void ServerManager::updateLedsPerSegment(AsyncWebServerRequest *request, uint8_t *data, size_t len,
+                                         size_t index, size_t total) {
+    Serial.println(String("[") + request->methodToString() + "] " + request->url());
+    String bodyContent = getBodyContent(data, len);
+
+    JsonDocument body;
+    DeserializationError error = deserializeJson(body, bodyContent);
+    if (error) {
+        request->send(400);
+        return;
+    }
+
+    if (body.containsKey("ledsPerSegment")) {
+        int ledsPerSegment = body["ledsPerSegment"].as<int>();
+        preferencesManager.setLedsPerSegment(ledsPerSegment);
+        ledManager.updateSegmentsFromPreferences();
         request->send(204);
         return;
     }
