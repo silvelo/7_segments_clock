@@ -3,8 +3,8 @@ window.onload = onLoad
 function onLoad() {
     getColors();
     getDeepSleep();
-    getTimeZone();
     getLedsPerSegment();
+    getTimeZone();
 }
 
 function getColors() {
